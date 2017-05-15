@@ -14,15 +14,16 @@ var constructors = require("./constructors");
 inquirer.prompt([
 
     {
-        type: "input",
-        message: "enter 'make' to create a new card or 'read' to review an existing card",
+        type: "list",
+        message: "Select 'make' to create a new card or 'read' to review an existing card",
+        choices: ["Make","Read"],
         name: "action"
     }
 
 
 ]).then(function(card) {
 
-    if (card.action === "make") {
+    if (card.action === "Make") {
 
         inquirer.prompt([
 
@@ -46,24 +47,30 @@ inquirer.prompt([
             }
 
         ]).then(function(makeCard){
-            var newBasicCard;
+            var newCard;
 
             if(makeCard.cardType === "Basic Card"){
-                newBasicCard = constructors.BasicCard(makeCard.question,makeCard.answer);
-                fs.appendFile("logQ.txt", newBasicCard.front);
-                fs.appendFile("logA.txt", newBasicCard.back);
+                newCard = constructors.BasicCard(makeCard.question,makeCard.answer);
+                fs.appendFile("logQ.txt", newCard.front + "\n");
+                fs.appendFile("logA.txt", newCard.back + "\n");
             }
             else if(makeCard.cardType === "Cloze Card"){
-                newBasicCard = constructors.ClozeCard(makeCard.question,makeCard.answer);
-                fs.appendFile("logQ.txt", newBasicCard.partial() + "\n");
-                fs.appendFile("logA.txt", newBasicCard.back + "\n");
+                newCard = constructors.ClozeCard(makeCard.question,makeCard.answer);
+                if(newCard.error){
+                    console.log(newCard.partial());
+                    return
+                }
+                else {
+                    fs.appendFile("logQ.txt", newCard.partial() + "\n");
+                    fs.appendFile("logA.txt", newCard.back + "\n");
+                }
             }
 
         });
 
     }
 
-    else if(card.action === "read"){
+    else if(card.action === "Read"){
 
         fs.readFile("logQ.txt", "utf8", function (error, data) {
 
