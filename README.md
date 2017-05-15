@@ -16,7 +16,7 @@ Example:
 
 **Answer:** George Washington
 
-##Cloze Cards
+## Cloze Cards
 
 These cards are made of an incomplete statement and the word(s) that complete it
 
@@ -28,7 +28,7 @@ Example:
 
 ---
 
-# Running the program
+## Running the program
 
 In the command line, enter the following:
 
@@ -38,7 +38,7 @@ The program will then take the user through a series of prompts where he/she can
 
 If you try to read a flashcard when there are no flashcards created, you will receive an error message.
 
-## Writing a new flashcard
+### Writing a new flashcard
 
 If the user selects "write" when prompted to select between "read" or "write" a flashcard, the user will then be asked what type of flashcard he/she wishes to create: _Basic Card_ or _Cloze Card_.
 
@@ -46,7 +46,7 @@ Then, the program will keep prompting the user to write the question/statement a
 
 If the user selects *Cloze Card* and tries to enter an _answer/completion word_ that is not included in the original full text, the program will throw an error and terminate.
 
-## Reading a flashcard
+### Reading a flashcard
 
 If the user selects "read" when prompted to choose between "read and "write", The user will be shown the list of all questions and unterminated statements (basic cards and cloze cards respectively).
 
