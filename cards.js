@@ -12,9 +12,9 @@ module.exports = {
         "Who was the first president of the United States?", "George Washington"),
 
     firstPresidentCloze: constructors.ClozeCard(
-    "George Washington was the first president of the United States.", "George Washington"),
+        "George Washington was the first president of the United States.", "George Washington"),
 
-    something: new constructors.ClozeCard("hello world", "dude")
+    something: constructors.ClozeCard("hello world", "dude")
 
 
 };

@@ -10,10 +10,12 @@ console.log(cards.firstPresident.front);
 
 console.log(cards.firstPresident.back);
 // "George Washington"
-console.log(cards.firstPresidentCloze.cloze);
+console.log(cards.firstPresidentCloze.back);
 
 // " ... was the first president of the United States.
-console.log(cards.firstPresidentCloze.partial);
+console.log(cards.firstPresidentCloze.partial());
 
 // "George Washington was the first president of the United States.
-console.log(cards.firstPresidentCloze.text);
+console.log(cards.firstPresidentCloze.front);
+
+console.log(cards.something.partial());
