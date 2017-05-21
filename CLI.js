@@ -36,6 +36,12 @@ inquirer.prompt([
 
             {
                 type: "input",
+                message: "Enter a name for this card (one word)",
+                name: "cardName"
+            },
+
+            {
+                type: "input",
                 message: "Enter your question or full text",
                 name: "question"
             },
@@ -48,11 +54,24 @@ inquirer.prompt([
 
         ]).then(function(makeCard){
             var newCard;
+            var newCardStringified;
 
             if(makeCard.cardType === "Basic Card"){
                 newCard = constructors.BasicCard(makeCard.question,makeCard.answer);
-                fs.appendFile("logQ.txt", newCard.front + "\n");
-                fs.appendFile("logA.txt", newCard.back + "\n");
+                //newCardStringified = JSON.stringify(newCard);
+                fs.readFile("logJSON.txt", "utf8", function (error, data) {
+                    var objectArray = JSON.parse(data);
+                    objectArray.cards.push(newCard);
+                    //objectArray.cards.push(newCard);
+                    var objectArrayString = JSON.stringify(objectArray);
+                    fs.writeFile("logJSON.txt", objectArrayString, function(err) {
+                        if(err) {
+                            return console.log(err);
+                        }
+                    });
+                });
+                // fs.appendFile("logJSON.txt","{" + '"' + makeCard.cardName + '"' + ":" + newCardStringified + "}" + "\n");
+                fs.appendFile("logCardName.txt", makeCard.cardName + "\n");
             }
             else if(makeCard.cardType === "Cloze Card"){
                 newCard = constructors.ClozeCard(makeCard.question,makeCard.answer);
@@ -61,8 +80,20 @@ inquirer.prompt([
                     return
                 }
                 else {
-                    fs.appendFile("logQ.txt", newCard.partial() + "\n");
-                    fs.appendFile("logA.txt", newCard.back + "\n");
+                    newCard.clozedText = newCard.partial();
+                    fs.readFile("logJSON.txt", "utf8", function (error, data) {
+                        var objectArray = JSON.parse(data);
+                        objectArray.cards.push(newCard);
+                        //objectArray.cards.push(newCard);
+                        var objectArrayString = JSON.stringify(objectArray);
+                        fs.writeFile("logJSON.txt", objectArrayString, function(err) {
+                            if(err) {
+                                return console.log(err);
+                            }
+                        });
+                    });
+                    // fs.appendFile("logJSON.txt","{" + '"' + makeCard.cardName + '"' + ":" + newCardStringified + "}" + "\n");
+                    fs.appendFile("logCardName.txt", makeCard.cardName + "\n");
                 }
             }
 
@@ -72,39 +103,77 @@ inquirer.prompt([
 
     else if(card.action === "Read"){
 
-        fs.readFile("logQ.txt", "utf8", function (error, data) {
+        fs.readFile("logCardName.txt", "utf8", function (error, data) {
 
             if(error){
                 console.log("hmmm there was an error. Your deck of cards must be empty, try making cards before you read them");
                 return
             }
 
-            var questions = data.split("\n");
+            //var questions = data.split("\n");
+            var cards = data.split("\n");
 
             inquirer.prompt([
 
                 // Here we give the user a list to choose from.
                 {
                     type: "list",
-                    message: "what question would you like to review?",
-                    choices: questions,
-                    name: "questionToReview"
+                    message: "what card would you like to review?",
+                    choices: cards,
+                    name: "cardToReview"
                 }
 
             ]).then(function (answer) {
-
+                var myJSON;
                 var index;
-                for (var x = 0; x < questions.length; x++) {
-                    if (answer.questionToReview === questions[x]) {
+                for(var x = 0; x < cards.length; x++){
+                    if (answer.cardToReview === cards[x]){
                         index = x;
                     }
                 }
-                fs.readFile("logA.txt", "utf8", function (error, data) {
-                    var answers = data.split("\n");
-                    console.log("The answer is: " + answers[index]);
 
+                fs.readFile("logJSON.txt", "utf8", function (error, data) {
+                    var cardChosen = answer.cardToReview;
+                    myJSON = JSON.parse(data);
+                    //console.log(myJSON[cardChosen].front);
+                    if(myJSON.cards[index].clozedText !== undefined) {
+                        console.log(myJSON.cards[index].clozedText);
+                    }else{
+                        console.log(myJSON.cards[index].front);
+                    }
+
+                    inquirer.prompt([
+
+                        // Here we give the user a list to choose from.
+                        {
+                            type: "input",
+                            message: "Enter your answer...",
+                            name: "userAnswer"
+                        }
+
+                    ]).then(function (user_answer) {
+                        if(myJSON.cards[index].clozedText !== undefined) {
+                            if (user_answer.userAnswer === myJSON.cards[index].back) {
+                                console.log("you got it!" + "\n" + "question: " + myJSON.cards[index].clozedText + "\n" + "answer: " + myJSON.cards[index].back)
+                            }
+                            else{
+                                console.log("hmm that's incorrect..." + "\n" + "question: " + myJSON.cards[index].clozedText + "\n" + "answer: " + myJSON.cards[index].back)
+                            }
+                        }
+                        else{
+                            if (user_answer.userAnswer === myJSON.cards[index].back) {
+                                console.log("you got it!" + "\n" + "question: " + myJSON.cards[index].front + "\n" + "answer: " + myJSON.cards[index].back)
+                            }
+                            else{
+                                console.log("hmm that's incorrect..." + "\n" + "question: " + myJSON.cards[index].front + "\n" + "answer: " + myJSON.cards[index].back)
+                            }
+                        }
+                    });
                 });
+
+
             });
         });
     }
 });
+
